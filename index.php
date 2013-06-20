@@ -4,7 +4,8 @@
     spl_autoload_register();
 
     // create game folder object
-    $gameFolder = new \riotDecode\GameFolder('C:\\Riot Games\\League of Legends\\');
+    //$gameFolder = new \riotDecode\GameFolder('D:\\9_Perso\\jeux\\Riot\\League of Legends\\');
+    $gameFolder = new \riotDecode\ExtractedGameFolder('D:\\9_Perso\\LOL\\Dumped\\');
 
     // retrieve available champions
     $availableChampions = $gameFolder->getChampions();
@@ -46,6 +47,8 @@
 
     if(!key_exists('SPELL', $_GET)) {
         echo '<select name="CHAMPION" onChange="this.form.submit()">';
+        
+        ksort($availableChampions);
         foreach($availableChampions as $champion => $path) {
             echo '<option value="' . $path . '"';
             if(key_exists('CHAMPION', $_GET) && $path == $_GET['CHAMPION']) {

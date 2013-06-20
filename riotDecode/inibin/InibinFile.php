@@ -1,20 +1,19 @@
 <?php
 namespace riotDecode\inibin;
 
-class InibinFile implements \ArrayAccess {
+use riotDecode\common\BaseFile;
+
+class InibinFile extends BaseFile {
     protected static $availableMappers;
 
     protected $keyMapping;
-
-    protected $file;
-
-    protected $values;
 
     protected $identifiedValues;
 
     protected $streamPointer = 0;
 
     public function __construct($file) {
+    	parent::__construct($file);
         if(self::$availableMappers === null) {
             self::$availableMappers = [];
 
@@ -26,8 +25,7 @@ class InibinFile implements \ArrayAccess {
                 }
             }
         }
-
-        $this->file = $file;
+        $this->indexable = true;
     }
 
     public function &getValues($translateKeys = true) {
@@ -45,7 +43,8 @@ class InibinFile implements \ArrayAccess {
 
                         $this->identifiedValues[$mapping[0]][$mapping[1]] = $this->values[$key];
                     } else {
-                        if(!key_exists($mapping[0], $this->identifiedValues)) {
+                        if(!key_exists('Irrelevant', $this->identifiedValues)) {
+                        	
                             $this->identifiedValues['Irrelevant'] = [];
                         }
 
@@ -62,50 +61,16 @@ class InibinFile implements \ArrayAccess {
         }
     }
 
-    public function offsetExists($offset) {
-        return key_exists($offset, $this->getValues());
-    }
 
-    public function offsetGet($offset) {
-        return $this->getValues()[$offset];
-    }
-
-    public function offsetSet($offset, $value) {
-        $this->getValues()[$offset] = $value;
-    }
-
-    public function offsetUnset($offset) {
-        unset($this->getValues()[$offset]);
-    }
-
-    public function __tostring() {
-        $result = '<table border="0" cellspacing="0" cellpadding="3" style="font-size:11px;font-family:arial;sans-serif;width:100%">'
-                .   '<thead>'
-                .     '<tr>'
-                .       '<td colspan="2" style="background-color:#c7e1f3;font-weight:bold;-moz-border-radius: 6px 6px 0 0;-webkit-border-radius: 6px 6px 0 0;border-radius: 6px 6px 0 0;border-bottom:1px solid #ffffff;text-align:center">' . $this->file->getPath() . '</td>'
-                .     '</tr>'
-                .   '</thead>'
-                .   '<tbody>';
-
-        foreach($this->getValues() as $groupName => $values) {
-            $result .= '<tr>';
-            $result .=   '<td colspan="2" style="background-color:#d1ecff;font-weight:bold;border-bottom:1px solid #ffffff;text-align:center">' . $groupName . '</td>';
-            $result .= '</tr>';
-
-            foreach($values as $key => $value) {
-                $result .= '<tr><td style="background-color:#edf6fd;border-bottom:1px solid #ffffff;white-space:nowrap;padding-right:40px">' . $key . '</td><td style="background-color:#f7f7f7;border-bottom:1px solid #ffffff;font-style:italic;width:100%">' . json_encode($value) . '</td></tr>';
-            }
-        }
-
-        $result .=   '</tbody>'
-                 . '</table>';
-
-        return $result;
+	public function showValue($value)
+    {
+    	return json_encode($value);
     }
 
     protected function decodeFile() {
         if($this->values === null) {
-            $content        = ($this->file instanceof \riotDecode\raf\RiotArchiveFileEntry) ? $this->file->getContent() : (@file_get_contents($this->file) or die('COULD NOT FIND INIBIN FILE: ' . $this->file));
+        	
+            $content        = $this->loadFileContent();
 
             $version        = $this->readFromStream($content, 'C');
             $oldLength      = $this->readFromStream($content, 'S');

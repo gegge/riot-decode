@@ -1,8 +1,9 @@
 <?php
-namespace riotDecode\txt;
+namespace riotDecode\json;
 
 use riotDecode\common\BaseFile;
-class TxtFile extends BaseFile {
+use riotDecode\common\Formater;
+class JsonFile extends BaseFile {
 	public function __construct($file) {
 		parent::__construct($file);
 		$this->indexable = true;
@@ -11,7 +12,7 @@ class TxtFile extends BaseFile {
 	public function &getValues($translateKeys = true) {
 		if ($this->values == null)
 		{
-			$this->values["content"]["txt"] = str_replace("\r\n", "<br>", $this->loadFileContent());
+			$this->values["content"]["json"] = $this->loadFileContent();
 			ksort($this->values);
 		}
 		return $this->values;
@@ -19,7 +20,7 @@ class TxtFile extends BaseFile {
 	
 	public function showValue($value)
 	{
-		return json_encode($value);
+		return '<code class="prettyprint">'. Formater::json($value, true) . '</code>';
 	}
 
 }

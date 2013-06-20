@@ -1,6 +1,9 @@
 <?php
 namespace riotDecode\raf;
 
+use riotDecode\unknown\UnknownFile;
+use riotDecode\txt\TxtFile;
+
 class RiotArchiveFileEntry {
     protected $riotArchiveFile;
 
@@ -50,7 +53,8 @@ class RiotArchiveFileEntry {
 		$pathInfo = \pathinfo($this->path);
 
 		if($pathInfo['extension'] == '') {
-			throw new \Exception('can not auto decode files without file extensions');
+			//throw new \Exception('can not auto decode files without file extensions');
+			return new TxtFile($this);
 		} else {
 			$decoderClassName = '\\riotDecode\\' . $pathInfo['extension'] . '\\' . strtoupper($pathInfo['extension'][0]) . substr($pathInfo['extension'], 1) . 'File';
 			
@@ -61,7 +65,8 @@ class RiotArchiveFileEntry {
 					throw new \Exception("no decoder for " . $pathInfo['extension'] . " files found");
 				}
 			} catch(\Exception $exception) {
-				throw new \Exception("no decoder for " . $pathInfo['extension'] . " files found");
+				//throw new \Exception("no decoder for " . $pathInfo['extension'] . " files found");
+				return new UnknownFile($this, $pathInfo['extension']);
 			}
 		}
 	}

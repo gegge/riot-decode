@@ -1,24 +1,22 @@
 <?php
 namespace riotDecode\anm;
 
-class AnmFile {
+use riotDecode\common\BaseFile;
+
+class AnmFile extends BaseFile {
 	protected static $availableMappers;
 
 	protected $keyMapping;
-
-    protected $file;
-
-	protected $values;
 
 	protected $identifiedValues;
 
 	protected $streamPointer = 0;
 
 	public function __construct($file) {
-		$this->file = $file;
-
-		echo $file->getPath() . "<br />";
-		echo $file->getRiotArchiveFile()->getVersion() . "<br />";
+		parent::__construct($file);
+		$this->indexable = false;
+		//echo $file->getPath() . "<br />";
+		//echo $file->getRiotArchiveFile()->getVersion() . "<br />";
 
 		$this->decodeFile();
 	}
@@ -63,30 +61,21 @@ class AnmFile {
 			return $this->values;
 		}
 	}
-
-	public function offsetExists($offset) {
-		return key_exists($offset, $this->getValues());
+	public function showValue($value)
+	{
+		//not implemented, cause : __tostring overide
 	}
-
-	public function offsetGet($offset) {
-		return $this->getValues()[$offset];
-	}
-
-	public function offsetSet($offset, $value) {
-		$this->getValues()[$offset] = $value;
-	}
-
-	public function offsetUnset($offset) {
-		unset($this->getValues()[$offset]);
-	}
-
+	
 	public function __tostring() {
 		return $this->decodeFile();
 	}
 
 	protected function decodeFile() {
+		
+		return;
+		
 		if($this->values === null) {
-			$content        = ($this->file instanceof \riotDecode\raf\RiotArchiveFileEntry) ? $this->file->getContent() : (@file_get_contents($this->file) or die('COULD NOT FIND INIBIN FILE: ' . $this->file));
+			$content        = $this->loadFileContent();
 
 			$this->readFromStream($content, 'L');
 			$this->readFromStream($content, 'L');

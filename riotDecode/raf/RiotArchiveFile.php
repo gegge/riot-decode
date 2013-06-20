@@ -53,10 +53,12 @@ class RiotArchiveFile implements \IteratorAggregate, \Countable {
 			}
 
 			fclose($descriptorHandle);
-
 			$this->dataFileHandle = @fopen($this->path . '.dat', 'r') or die('COULD NOT OPEN DATA FILE: ' . $this->path . '.dat');
 		}
 	}
+	
+	
+	
 
 	public function __destruct() {
 		if($this->magicNumber !== null) {
